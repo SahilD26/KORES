@@ -513,6 +513,9 @@ export default function App(){
             style={{cursor:"pointer",border:`1px solid ${C.hair}`,background:C.panel,borderRadius:9,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:C.shadow}}>
             <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2" fill="none" stroke={C.ink} strokeWidth="1.4"/><line x1="5.5" y1="2" x2="5.5" y2="14" stroke={C.ink} strokeWidth="1.4"/></svg>
           </button>
+          {!side&&<div style={{background:"#fff",borderRadius:9,padding:"5px 10px",display:"flex",alignItems:"center",boxShadow:C.shadow,border:`1px solid ${C.hair}`,flexShrink:0}}>
+            <img src={LOGO} alt="Kores" style={{height:26,objectFit:"contain",display:"block"}}/>
+          </div>}
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontFamily:C.serif,fontSize:27,fontWeight:600,lineHeight:1.05,letterSpacing:"-0.015em",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
               {isGroup?"All Foundries":PLANT_META[plant].name}
