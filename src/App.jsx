@@ -341,7 +341,7 @@ export default function App(){
   function ctx(){ return {goPlant,setSide,setTab,setRca,openFirstRow:()=>setWantOpen(true)}; }
 
   /* highlight for the active tour target */
-  const H=(k)=>demo&&TOUR[step].hl===k?{boxShadow:`0 0 0 3px ${C.koresBlue}, 0 0 20px rgba(41,171,226,0.45)`,borderRadius:8,position:"relative",zIndex:5,transition:"box-shadow .3s"}:{};
+  const H=(k)=>demo&&TOUR[step].hl===k?{outline:`3px solid ${C.koresBlue}`,outlineOffset:2,boxShadow:`0 0 0 6px rgba(41,171,226,0.18), 0 0 26px rgba(41,171,226,0.35)`,borderRadius:8,position:"relative",zIndex:5}:{};
 
   /* ---- live data: embedded reports, optionally overridden by daily uploads ---- */
   const [live,setLive]=useState(null);          /* {PEFCO:{items,meta},...} */
@@ -479,7 +479,7 @@ export default function App(){
   return(<div style={{display:"flex",minHeight:"100vh",background:"radial-gradient(1200px 700px at 78% -8%,#F6F8FC 0%,rgba(246,248,252,0) 60%),radial-gradient(900px 600px at -6% 4%,#EAF1FA 0%,rgba(234,241,250,0) 55%),linear-gradient(180deg,#EDF1F7 0%,#E7ECF4 100%)",fontFamily:C.sans,color:C.ink}}>
 
     {/* ============ SIDEBAR ============ */}
-    <div style={{width:side?236:0,minWidth:side?236:0,background:C.side,transition:"all .25s ease",overflow:"hidden",display:"flex",flexDirection:"column",position:"sticky",top:0,height:"100vh",boxShadow:"1px 0 0 rgba(255,255,255,0.05), 8px 0 32px -18px rgba(0,0,0,0.55)",...H("sidebar")}}>
+    <div style={{width:side?236:0,minWidth:side?236:0,background:C.side,transition:"width .25s ease, min-width .25s ease",overflow:"hidden",display:"flex",flexDirection:"column",position:"sticky",top:0,height:"100vh",boxShadow:"1px 0 0 rgba(255,255,255,0.05), 8px 0 32px -18px rgba(0,0,0,0.55)",...H("sidebar")}}>
       <div style={{padding:"18px 16px 15px",borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
         <div style={{background:"#fff",borderRadius:10,padding:"9px 10px",display:"flex",justifyContent:"center",boxShadow:"0 6px 16px -8px rgba(0,0,0,0.5)"}}>
           <img src={LOGO} alt="Kores" style={{height:34,objectFit:"contain"}}/>

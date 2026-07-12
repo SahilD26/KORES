@@ -47,10 +47,12 @@
       .eiBtn:hover { filter: brightness(1.06); transform: translateY(-1px); }
       .eiBtn:active { transform: translateY(0) scale(0.98); }
 
-      /* gentle page entrance on load */
-      @keyframes eiFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+      /* gentle page entrance on load (opacity only — no lingering transform
+         on #root, which would create a containing block and break descendant
+         box-shadow transitions such as the guided-tour highlight ring) */
+      @keyframes eiFade { from { opacity: 0; } to { opacity: 1; } }
       @media (prefers-reduced-motion: no-preference) {
-        #root { animation: eiFade .45s cubic-bezier(.2,.7,.2,1) both; }
+        #root { animation: eiFade .4s ease both; }
       }
     </style>
   </head>
