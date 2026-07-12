@@ -11,13 +11,47 @@
       rel="stylesheet"
     />
     <style>
-      :root { font-family: "Google Sans", "Google Sans Text", Inter, -apple-system, "Segoe UI", sans-serif; }
+      :root {
+        font-family: "Google Sans", "Google Sans Text", Inter, -apple-system, "Segoe UI", sans-serif;
+        --ei-canvas: #EDF1F7;
+      }
+      * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+      html, body { margin: 0; background: var(--ei-canvas); }
       body {
         font-family: "Google Sans", "Google Sans Text", Inter, -apple-system, "Segoe UI", sans-serif;
         font-variant-numeric: tabular-nums;
       }
       /* keep numeric columns aligned now that the mono font is Google Sans */
       table, [class*="num"], [class*="tab"] { font-variant-numeric: tabular-nums; }
+
+      /* selection + focus */
+      ::selection { background: rgba(41,171,226,0.22); }
+      :focus-visible { outline: 2px solid rgba(41,171,226,0.55); outline-offset: 2px; }
+
+      /* refined thin scrollbars */
+      * { scrollbar-width: thin; scrollbar-color: #C2CEDD transparent; }
+      *::-webkit-scrollbar { width: 10px; height: 10px; }
+      *::-webkit-scrollbar-thumb { background: #C2CEDD; border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
+      *::-webkit-scrollbar-thumb:hover { background: #A9B8CB; background-clip: content-box; }
+      *::-webkit-scrollbar-track { background: transparent; }
+
+      /* premium card: hover lift + crisper shadow */
+      .eiCard { transition: transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s cubic-bezier(.2,.7,.2,1), border-color .22s ease; will-change: transform; }
+      .eiCard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(16,30,54,0.06), 0 26px 50px -22px rgba(16,30,54,0.32) !important; border-color: #D3DDEA !important; }
+
+      /* nav + button micro-interactions */
+      .eiNav { transition: background .18s ease, transform .16s ease; }
+      .eiNav:hover { background: rgba(255,255,255,0.07) !important; transform: translateX(2px); }
+      .eiNavOn:hover { transform: none; }
+      .eiBtn { transition: transform .14s ease, box-shadow .2s ease, filter .2s ease; }
+      .eiBtn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+      .eiBtn:active { transform: translateY(0) scale(0.98); }
+
+      /* gentle page entrance on load */
+      @keyframes eiFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+      @media (prefers-reduced-motion: no-preference) {
+        #root { animation: eiFade .45s cubic-bezier(.2,.7,.2,1) both; }
+      }
     </style>
   </head>
   <body>

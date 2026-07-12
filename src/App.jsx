@@ -12,11 +12,18 @@ const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkwAAADPCAMAAAAwAX6u
 /* ================================================================== */
 
 const C = {
-  paper:"#F4F5F7", panel:"#FFFFFF", ink:"#182A40", slate:"#5C6C81", hair:"#DCE2E9",
-  red:"#B93A3A", redSoft:"#F8ECEC", amber:"#A9761C", amberSoft:"#F7EEDC",
-  green:"#2E7D5B", greenSoft:"#E6F1EC", navy:"#22405F", navySoft:"#E7EDF4",
-  violet:"#5B4B8A", violetSoft:"#ECE8F4", kores:"#E63329", koresBlue:"#29ABE2",
-  side:"#1B2B3F",
+  paper:"#EDF1F7", panel:"#FFFFFF", ink:"#15233B", slate:"#64748B", hair:"#E3E9F1",
+  red:"#C0392B", redSoft:"#FBECEA", amber:"#B27C15", amberSoft:"#FaF1DD",
+  green:"#12886A", greenSoft:"#E3F2EC", navy:"#1E3A5F", navySoft:"#E8EEF6",
+  violet:"#6B4FA8", violetSoft:"#EEEAF7", kores:"#E63329", koresBlue:"#29ABE2",
+  side:"linear-gradient(180deg,#16233B 0%,#0E1626 100%)", sideSolid:"#121E33",
+  /* depth + motion tokens (Fortune-50 command-console styling) */
+  shadow:"0 1px 2px rgba(16,30,54,0.04), 0 8px 24px -12px rgba(16,30,54,0.18)",
+  shadowLg:"0 2px 4px rgba(16,30,54,0.05), 0 24px 48px -20px rgba(16,30,54,0.28)",
+  ring:"rgba(41,171,226,0.45)",
+  grad:"linear-gradient(135deg,#1E3A5F 0%,#2D5C8A 100%)",
+  gradRed:"linear-gradient(135deg,#E63329 0%,#B01F16 100%)",
+  radius:14,
   mono:"'Google Sans','Google Sans Text',Inter,-apple-system,'Segoe UI',sans-serif", serif:"'Google Sans','Google Sans Display',Newsreader,Georgia,serif",
   sans:"'Google Sans','Google Sans Text',Inter,-apple-system,'Segoe UI',sans-serif",
 };
@@ -137,11 +144,11 @@ async function parsePlantFile(file){
 }
 
 /* ---------- atoms ---------- */
-const Lb=({children,style})=><div style={{fontFamily:C.sans,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:C.slate,fontWeight:600,...style}}>{children}</div>;
-const Nm=({v,color=C.ink,size=22,suffix})=><div style={{fontFamily:C.mono,fontSize:size,fontWeight:600,color,lineHeight:1.15}}>{typeof v==="number"?fmt(v):v}{suffix&&<span style={{fontSize:size*0.55,color:C.slate,fontWeight:500}}> {suffix}</span>}</div>;
-const Pn=({children,style})=><div style={{background:C.panel,border:`1px solid ${C.hair}`,borderRadius:6,padding:16,...style}}>{children}</div>;
+const Lb=({children,style})=><div style={{fontFamily:C.sans,fontSize:10,letterSpacing:"0.13em",textTransform:"uppercase",color:C.slate,fontWeight:600,...style}}>{children}</div>;
+const Nm=({v,color=C.ink,size=22,suffix})=><div style={{fontFamily:C.mono,fontSize:size,fontWeight:600,color,lineHeight:1.12,letterSpacing:"-0.01em",fontVariantNumeric:"tabular-nums"}}>{typeof v==="number"?fmt(v):v}{suffix&&<span style={{fontSize:size*0.55,color:C.slate,fontWeight:500}}> {suffix}</span>}</div>;
+const Pn=({children,style,className})=><div className={"eiCard"+(className?" "+className:"")} style={{background:C.panel,border:`1px solid ${C.hair}`,borderRadius:C.radius,padding:18,boxShadow:C.shadow,...style}}>{children}</div>;
 const Tag=({rca,small})=>{const m=RCA_META[rca];if(!m)return null;
-  return <span style={{fontFamily:C.mono,fontSize:small?8.5:9.5,fontWeight:700,color:m.c,background:m.s,border:`1px solid ${m.c}33`,borderRadius:3,padding:"1px 6px",whiteSpace:"nowrap"}}>{rca}</span>;};
+  return <span style={{fontFamily:C.mono,fontSize:small?8.5:9.5,fontWeight:700,color:m.c,background:m.s,border:`1px solid ${m.c}30`,borderRadius:999,padding:"2px 9px",whiteSpace:"nowrap",letterSpacing:"0.02em"}}>{rca}</span>;};
 const Spark=({dp,dd,w=110,h=26})=>{const mx=Math.max(...dp,...dd,1),bw=w/Math.max(dp.length,1);
   return(<svg width={w} height={h} style={{display:"block"}}>
     {dp.map((v,i)=><rect key={"p"+i} x={i*bw+1} y={h-(v/mx)*h} width={bw*0.42} height={(v/mx)*h||0.5} fill={C.navy} opacity={v?1:0.15}/>)}
@@ -461,22 +468,24 @@ export default function App(){
 
   /* sidebar nav item */
   const NavItem=({k,label,sub,active,onClick})=>(
-    <div onClick={onClick} style={{cursor:"pointer",padding:"10px 14px",borderRadius:6,margin:"2px 8px",
-      background:active?"rgba(255,255,255,0.12)":"transparent",borderLeft:active?`3px solid ${C.kores}`:"3px solid transparent"}}>
-      <div style={{fontFamily:C.sans,fontSize:13,fontWeight:600,color:active?"#fff":"#B9C4D2"}}>{label}</div>
-      {sub&&<div style={{fontFamily:C.mono,fontSize:9.5,color:active?"#D5DDE7":"#7A8AA0",marginTop:2}}>{sub}</div>}
+    <div onClick={onClick} className={"eiNav"+(active?" eiNavOn":"")} style={{cursor:"pointer",padding:"11px 15px",borderRadius:10,margin:"2px 10px",position:"relative",
+      background:active?"linear-gradient(90deg,rgba(230,51,41,0.16),rgba(255,255,255,0.04))":"transparent",
+      boxShadow:active?"inset 0 0 0 1px rgba(255,255,255,0.06)":"none",transition:"background .18s ease,transform .18s ease"}}>
+      {active&&<span style={{position:"absolute",left:0,top:9,bottom:9,width:3,borderRadius:3,background:C.kores}}/>}
+      <div style={{fontFamily:C.sans,fontSize:13,fontWeight:600,color:active?"#fff":"#AEBACB",letterSpacing:"0.005em"}}>{label}</div>
+      {sub&&<div style={{fontFamily:C.mono,fontSize:9.5,color:active?"#CBD6E4":"#76869C",marginTop:2}}>{sub}</div>}
     </div>);
 
-  return(<div style={{display:"flex",minHeight:"100vh",background:C.paper,fontFamily:C.sans,color:C.ink}}>
+  return(<div style={{display:"flex",minHeight:"100vh",background:"radial-gradient(1200px 700px at 78% -8%,#F6F8FC 0%,rgba(246,248,252,0) 60%),radial-gradient(900px 600px at -6% 4%,#EAF1FA 0%,rgba(234,241,250,0) 55%),linear-gradient(180deg,#EDF1F7 0%,#E7ECF4 100%)",fontFamily:C.sans,color:C.ink}}>
 
     {/* ============ SIDEBAR ============ */}
-    <div style={{width:side?236:0,minWidth:side?236:0,background:C.side,transition:"all .25s ease",overflow:"hidden",display:"flex",flexDirection:"column",position:"sticky",top:0,height:"100vh",...H("sidebar")}}>
-      <div style={{padding:"18px 16px 14px",borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
-        <div style={{background:"#fff",borderRadius:6,padding:"8px 10px",display:"flex",justifyContent:"center"}}>
+    <div style={{width:side?236:0,minWidth:side?236:0,background:C.side,transition:"all .25s ease",overflow:"hidden",display:"flex",flexDirection:"column",position:"sticky",top:0,height:"100vh",boxShadow:"1px 0 0 rgba(255,255,255,0.05), 8px 0 32px -18px rgba(0,0,0,0.55)",...H("sidebar")}}>
+      <div style={{padding:"18px 16px 15px",borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
+        <div style={{background:"#fff",borderRadius:10,padding:"9px 10px",display:"flex",justifyContent:"center",boxShadow:"0 6px 16px -8px rgba(0,0,0,0.5)"}}>
           <img src={LOGO} alt="Kores" style={{height:34,objectFit:"contain"}}/>
         </div>
-        <div style={{fontFamily:C.mono,fontSize:9,letterSpacing:"0.16em",color:"#7A8AA0",marginTop:10,textAlign:"center"}}>FOUNDRY GAP & RCA CONSOLE</div>
-        <button onClick={startDemo} style={{marginTop:12,width:"100%",cursor:"pointer",fontFamily:C.sans,fontSize:12,fontWeight:600,padding:"9px 10px",borderRadius:6,border:"none",background:C.kores,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",gap:7}}>
+        <div style={{fontFamily:C.mono,fontSize:9,letterSpacing:"0.18em",color:"#8493A8",marginTop:11,textAlign:"center"}}>FOUNDRY GAP &amp; RCA CONSOLE</div>
+        <button onClick={startDemo} className="eiBtn" style={{marginTop:13,width:"100%",cursor:"pointer",fontFamily:C.sans,fontSize:12,fontWeight:600,padding:"10px 10px",borderRadius:10,border:"none",background:C.gradRed,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",gap:7,boxShadow:"0 8px 20px -8px rgba(230,51,41,0.6)"}}>
           <svg width="11" height="12" viewBox="0 0 11 12"><path d="M0 0 L11 6 L0 12 Z" fill="#fff"/></svg>
           Guided demo · voice
         </button>
@@ -499,13 +508,13 @@ export default function App(){
       <div style={{maxWidth:1180,margin:"0 auto"}}>
 
         {/* header: toggle + single heading */}
-        <div style={{display:"flex",alignItems:"center",gap:12,borderBottom:`2px solid ${C.ink}`,paddingBottom:10,marginBottom:12}}>
-          <button onClick={()=>setSide(!side)} title={side?"Hide sidebar":"Show sidebar"}
-            style={{cursor:"pointer",border:`1px solid ${C.hair}`,background:C.panel,borderRadius:5,width:34,height:34,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,borderBottom:`1px solid ${C.hair}`,boxShadow:`0 1px 0 rgba(255,255,255,0.6)`,paddingBottom:12,marginBottom:14}}>
+          <button onClick={()=>setSide(!side)} title={side?"Hide sidebar":"Show sidebar"} className="eiBtn"
+            style={{cursor:"pointer",border:`1px solid ${C.hair}`,background:C.panel,borderRadius:9,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:C.shadow}}>
             <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2" fill="none" stroke={C.ink} strokeWidth="1.4"/><line x1="5.5" y1="2" x2="5.5" y2="14" stroke={C.ink} strokeWidth="1.4"/></svg>
           </button>
           <div style={{flex:1,minWidth:0}}>
-            <div style={{fontFamily:C.serif,fontSize:26,fontWeight:600,lineHeight:1.05,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+            <div style={{fontFamily:C.serif,fontSize:27,fontWeight:600,lineHeight:1.05,letterSpacing:"-0.015em",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
               {isGroup?"All Foundries":PLANT_META[plant].name}
             </div>
           </div>
