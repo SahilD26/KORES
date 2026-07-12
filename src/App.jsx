@@ -17,8 +17,8 @@ const C = {
   green:"#2E7D5B", greenSoft:"#E6F1EC", navy:"#22405F", navySoft:"#E7EDF4",
   violet:"#5B4B8A", violetSoft:"#ECE8F4", kores:"#E63329", koresBlue:"#29ABE2",
   side:"#1B2B3F",
-  mono:"'IBM Plex Mono',Menlo,monospace", serif:"Newsreader,Georgia,serif",
-  sans:"Inter,-apple-system,'Segoe UI',sans-serif",
+  mono:"'Google Sans','Google Sans Text',Inter,-apple-system,'Segoe UI',sans-serif", serif:"'Google Sans','Google Sans Display',Newsreader,Georgia,serif",
+  sans:"'Google Sans','Google Sans Text',Inter,-apple-system,'Segoe UI',sans-serif",
 };
 const fmt=(n)=>Math.round(n).toLocaleString("en-IN");
 const fmtT=(kg)=>(kg/1000).toLocaleString("en-IN",{maximumFractionDigits:1})+" t";
