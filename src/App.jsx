@@ -444,6 +444,7 @@ export default function App(){
     if(grp!=="ALL")r=r.filter(x=>x.g===grp);
     if(rca!=="ALL")r=r.filter(x=>x.rca===rca);
     if(q.trim()){const s=q.trim().toLowerCase();r=r.filter(x=>x.mc.toLowerCase().includes(s)||x.d.toLowerCase().includes(s));}
+    if(sortBy==="az")return [...r].sort((a,b)=>a.d.localeCompare(b.d,undefined,{sensitivity:"base",numeric:true}));
     const key={res:x=>-x.res,bal:x=>-x.bal,rej:x=>-x.rej,tb:x=>-x.tb,inv:x=>-x.inv}[sortBy];
     return [...r].sort((a,b)=>key(a)-key(b));
   },[D,line,grp,rca,q,sortBy]);
@@ -878,6 +879,7 @@ export default function App(){
               <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={sel}>
                 <option value="res">Sort: true gap</option><option value="bal">Sort: balance</option>
                 <option value="tb">Sort: to-produce (incl. min-stock)</option><option value="rej">Sort: rejections</option><option value="inv">Sort: dispatched</option>
+                <option value="az">Sort: A–Z (description)</option>
               </select>
             </div>
             <div style={{overflowX:"auto"}}>
