@@ -233,7 +233,7 @@ export default function App(){
   const [tab,setTab]=useState("OVERVIEW");
   const [line,setLine]=useState("ALL"); const [grp,setGrp]=useState("ALL");
   const [rca,setRca]=useState("ALL"); const [q,setQ]=useState("");
-  const [sortBy,setSortBy]=useState("res"); const [limit,setLimit]=useState(40);
+  const [sortBy,setSortBy]=useState("res"); const [alpha,setAlpha]=useState("none"); const [limit,setLimit]=useState(40);
   const [open,setOpen]=useState(null);
 
   /* ---- guided demo state & engine (hardened for phone / laptop / tablet) ---- */
@@ -444,10 +444,13 @@ export default function App(){
     if(grp!=="ALL")r=r.filter(x=>x.g===grp);
     if(rca!=="ALL")r=r.filter(x=>x.rca===rca);
     if(q.trim()){const s=q.trim().toLowerCase();r=r.filter(x=>x.mc.toLowerCase().includes(s)||x.d.toLowerCase().includes(s));}
-    if(sortBy==="az")return [...r].sort((a,b)=>a.d.localeCompare(b.d,undefined,{sensitivity:"base",numeric:true}));
+    const alphaOpt={sensitivity:"base",numeric:true};
+    if(alpha==="az")return [...r].sort((a,b)=>a.d.localeCompare(b.d,undefined,alphaOpt));
+    if(alpha==="za")return [...r].sort((a,b)=>b.d.localeCompare(a.d,undefined,alphaOpt));
+    if(alpha==="num")return [...r].sort((a,b)=>a.mc.localeCompare(b.mc,undefined,alphaOpt));
     const key={res:x=>-x.res,bal:x=>-x.bal,rej:x=>-x.rej,tb:x=>-x.tb,inv:x=>-x.inv}[sortBy];
     return [...r].sort((a,b)=>key(a)-key(b));
-  },[D,line,grp,rca,q,sortBy]);
+  },[D,line,grp,rca,q,sortBy,alpha]);
 
   React.useEffect(()=>{ if(wantOpen&&rows.length){ setOpen(rows[0].mc+rows[0].ln+"0"); setWantOpen(false); } },[wantOpen,rows]);
 
@@ -876,10 +879,15 @@ export default function App(){
               <select value={line} onChange={e=>{setLine(e.target.value);setLimit(40);}} style={sel}><option value="ALL">All lines</option>{D.lines.map(l=><option key={l}>{l}</option>)}</select>
               <select value={grp} onChange={e=>{setGrp(e.target.value);setLimit(40);}} style={sel}><option value="ALL">All groups</option>{groups.map(g=><option key={g}>{g}</option>)}</select>
               <select value={rca} onChange={e=>{setRca(e.target.value);setLimit(40);}} style={sel}><option value="ALL">All root causes</option>{RCA_ORDER.map(k=><option key={k}>{k}</option>)}</select>
-              <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={sel}>
+              <select value={sortBy} onChange={e=>{setSortBy(e.target.value);setAlpha("none");setLimit(40);}} style={sel} disabled={alpha!=="none"} title={alpha!=="none"?"Clear the A–Z order to sort by a metric":""}>
                 <option value="res">Sort: true gap</option><option value="bal">Sort: balance</option>
                 <option value="tb">Sort: to-produce (incl. min-stock)</option><option value="rej">Sort: rejections</option><option value="inv">Sort: dispatched</option>
-                <option value="az">Sort: A–Z (description)</option>
+              </select>
+              <select value={alpha} onChange={e=>{setAlpha(e.target.value);setLimit(40);}} style={sel}>
+                <option value="none">Order: default</option>
+                <option value="az">Order: A → Z (name)</option>
+                <option value="za">Order: Z → A (name)</option>
+                <option value="num">Order: number-wise (code)</option>
               </select>
             </div>
             <div style={{overflowX:"auto"}}>
