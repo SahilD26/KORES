@@ -348,11 +348,36 @@ export default function App(){
   const [upMsg,setUpMsg]=useState([]);
   const [drag,setDrag]=useState(false);
   const [busy,setBusy]=useState(false);
+  const [synced,setSynced]=useState(null);      /* last time shared data was pulled */
   const fileRef=React.useRef(null);
-  React.useEffect(()=>{(async()=>{try{
-    const r=await fetch("/.netlify/functions/data",{cache:"no-store"});
-    if(r.ok){const j=await r.json();if(j&&typeof j==="object")setLive(j);}
-  }catch(e){}})();},[]);
+  const liveRawRef=React.useRef("null");        /* serialized copy of what the server last had */
+  const busyRef=React.useRef(false);
+  React.useEffect(()=>{busyRef.current=busy;},[busy]);
+  /* load shared data on open, then poll every 60s so open tabs pick up
+     uploads made by anyone else — without disturbing an in-progress upload */
+  React.useEffect(()=>{
+    let stop=false;
+    const pull=async()=>{
+      if(busyRef.current)return;                /* don't clobber a live upload */
+      try{
+        const r=await fetch("/.netlify/functions/data",{cache:"no-store"});
+        if(!r.ok||stop)return;
+        const txt=await r.text();
+        if(stop||busyRef.current)return;
+        if(txt!==liveRawRef.current){
+          liveRawRef.current=txt;
+          let j=null;try{j=JSON.parse(txt);}catch(e){return;}
+          setLive(j&&typeof j==="object"?j:null);
+        }
+        setSynced(new Date());
+      }catch(e){}
+    };
+    pull();
+    const id=setInterval(pull,60000);
+    const onFocus=()=>pull();                    /* also refresh when tab regains focus */
+    window.addEventListener("focus",onFocus);
+    return ()=>{stop=true;clearInterval(id);window.removeEventListener("focus",onFocus);};
+  },[]);
 
   const eff=useMemo(()=>{const o={};PLANT_KEYS.forEach(k=>{
     const up=live&&live[k];
@@ -426,9 +451,10 @@ export default function App(){
     if(Object.keys(upd).length)setLive(upd);
     setBusy(false);
     if(Object.keys(upd).length){
+      const payload=JSON.stringify(upd);
       try{
-        const res=await fetch("/.netlify/functions/data",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(upd)});
-        if(res.ok)msgs.push({k:"ok",t:"Saved to shared storage — everyone sees this after a refresh."});
+        const res=await fetch("/.netlify/functions/data",{method:"POST",headers:{"content-type":"application/json"},body:payload});
+        if(res.ok){liveRawRef.current=payload;msgs.push({k:"ok",t:"Saved to shared storage — everyone sees this within a minute (or on refresh)."});}
         else msgs.push({k:"err",t:"Parsed locally, but saving to shared storage failed (HTTP "+res.status+")."});
       }catch(e){msgs.push({k:"err",t:"Parsed locally, but could not reach shared storage — check your connection."});}
     }
@@ -437,6 +463,7 @@ export default function App(){
   async function resetData(){
     setLive(null);
     try{await fetch("/.netlify/functions/data",{method:"DELETE"});
+      liveRawRef.current="null";
       setUpMsg([{k:"ok",t:"Reverted to the embedded 10 Jul reports for everyone."}]);
     }catch(e){setUpMsg([{k:"err",t:"Reverted locally, but could not clear shared storage."}]);}
   }
@@ -536,6 +563,7 @@ export default function App(){
           </div>
           <div style={{textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.slate,whiteSpace:"nowrap"}}>
             Day {D.gone} of {D.month} · {D.left} days remain{!isGroup&&<><br/>{eff[plant].meta.file}{eff[plant].meta.src==="uploaded"?" · uploaded":""}</>}
+            {synced&&<><br/><span style={{color:C.green,fontWeight:600}}>● live</span> · synced {synced.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</>}
           </div>
         </div>
 
