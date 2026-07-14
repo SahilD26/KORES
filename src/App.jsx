@@ -350,8 +350,8 @@ export default function App(){
   const [busy,setBusy]=useState(false);
   const fileRef=React.useRef(null);
   React.useEffect(()=>{(async()=>{try{
-    const r=await window.storage.get("kores-plants-v1");
-    if(r&&r.value)setLive(JSON.parse(r.value));
+    const r=await fetch("/.netlify/functions/data",{cache:"no-store"});
+    if(r.ok){const j=await r.json();if(j&&typeof j==="object")setLive(j);}
   }catch(e){}})();},[]);
 
   const eff=useMemo(()=>{const o={};PLANT_KEYS.forEach(k=>{
@@ -424,12 +424,21 @@ export default function App(){
       }catch(e){msgs.push({k:"err",t:f.name+": "+(e&&e.message?e.message:"could not parse")+"."});}
     }
     if(Object.keys(upd).length)setLive(upd);
-    setUpMsg(msgs); setBusy(false);
-    try{await window.storage.set("kores-plants-v1",JSON.stringify(upd));}catch(e){}
+    setBusy(false);
+    if(Object.keys(upd).length){
+      try{
+        const res=await fetch("/.netlify/functions/data",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(upd)});
+        if(res.ok)msgs.push({k:"ok",t:"Saved to shared storage — everyone sees this after a refresh."});
+        else msgs.push({k:"err",t:"Parsed locally, but saving to shared storage failed (HTTP "+res.status+")."});
+      }catch(e){msgs.push({k:"err",t:"Parsed locally, but could not reach shared storage — check your connection."});}
+    }
+    setUpMsg(msgs);
   }
   async function resetData(){
-    setLive(null);setUpMsg([{k:"ok",t:"Reverted to the embedded 10 Jul reports."}]);
-    try{await window.storage.delete("kores-plants-v1");}catch(e){}
+    setLive(null);
+    try{await fetch("/.netlify/functions/data",{method:"DELETE"});
+      setUpMsg([{k:"ok",t:"Reverted to the embedded 10 Jul reports for everyone."}]);
+    }catch(e){setUpMsg([{k:"err",t:"Reverted locally, but could not clear shared storage."}]);}
   }
 
   const isGroup=plant==="GROUP";
@@ -672,7 +681,7 @@ export default function App(){
               </table>
             </div>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10,gap:10,flexWrap:"wrap"}}>
-              <div style={{fontFamily:C.sans,fontSize:10.5,color:C.slate,lineHeight:1.5}}>Files are read entirely on your device and saved to this artifact's private storage — the console reopens with your latest upload. Filenames must contain the foundry name; the report date is read from the sheet title (or the DD_MM_YY in the filename).</div>
+              <div style={{fontFamily:C.sans,fontSize:10.5,color:C.slate,lineHeight:1.5}}>Files are parsed on your device, then saved to shared cloud storage — everyone who opens (or refreshes) the console sees your latest upload. Filenames must contain the foundry name; the report date is read from the sheet title (or the DD_MM_YY in the filename).</div>
               <button onClick={resetData} style={{cursor:"pointer",whiteSpace:"nowrap",fontFamily:C.sans,fontSize:11,padding:"7px 12px",borderRadius:4,border:`1px solid ${C.hair}`,background:C.panel,color:C.ink}}>Reset to embedded reports</button>
             </div>
           </Pn>}
